@@ -1,103 +1,164 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { questions } from "@/lib/questions";
+import { Player, getPlayers, addPlayer, removePlayer } from "@/lib/players";
+import { SpinningWheel } from "@/components/spinning-wheel";
+import { ArrowBigRightDash, Trash2 } from "lucide-react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [newPlayerName, setNewPlayerName] = useState<string>("");
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
+  const [isSpinning, setIsSpinning] = useState<boolean>(false);
+  const [usedQuestions, setUsedQuestions] = useState<number[]>([]);
+  const [answeredPlayers, setAnsweredPlayers] = useState<string[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    setPlayers(getPlayers());
+  }, []);
+
+  const handleAddPlayer = () => {
+    if (newPlayerName.trim()) {
+      const updatedPlayers = addPlayer(newPlayerName.trim());
+      setPlayers(updatedPlayers);
+      setNewPlayerName("");
+    }
+  };
+
+  const handleRemovePlayer = (id: string) => {
+    setPlayers(removePlayer(id));
+  };
+
+  const startSpinning = () => {
+    setIsSpinning(true);
+    let spinCount = 0;
+    const maxSpins = 20;
+    let finalQuestionId: number | null = null;
+    let finalPlayerId: string | null = null;
+
+    const spinInterval = setInterval(() => {
+      // During spinning, show random selection from all players and questions
+      const randomPlayer = players[Math.floor(Math.random() * players.length)];
+      const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+
+      if (randomPlayer && randomQuestion) {
+        setCurrentPlayer(randomPlayer);
+        setCurrentQuestion(randomQuestion.text);
+      }
+
+      spinCount++;
+      if (spinCount >= maxSpins) {
+        clearInterval(spinInterval);
+        setIsSpinning(false);
+
+        // For final selection, choose only from unused options
+        const availablePlayers = players.filter((p) => !answeredPlayers.includes(p.id));
+        const availableQuestions = questions.filter((q) => !usedQuestions.includes(q.id));
+
+        // Reset if all have been used
+        if (availablePlayers.length === 0) {
+          setAnsweredPlayers([]);
+          finalPlayerId = players[Math.floor(Math.random() * players.length)].id;
+        } else {
+          finalPlayerId = availablePlayers[Math.floor(Math.random() * availablePlayers.length)].id;
+        }
+
+        if (availableQuestions.length === 0) {
+          setUsedQuestions([]);
+          finalQuestionId = questions[Math.floor(Math.random() * questions.length)].id;
+        } else {
+          finalQuestionId = availableQuestions[Math.floor(Math.random() * availableQuestions.length)].id;
+        }
+
+        // Set final selection
+        if (finalPlayerId && finalQuestionId) {
+          const finalPlayer = players.find((p) => p.id === finalPlayerId);
+          const finalQuestion = questions.find((q) => q.id === finalQuestionId);
+          if (finalPlayer && finalQuestion) {
+            setCurrentPlayer(finalPlayer);
+            setCurrentQuestion(finalQuestion.text);
+            setAnsweredPlayers((prev) => [...prev, finalPlayerId!]);
+            setUsedQuestions((prev) => [...prev, finalQuestionId!]);
+          }
+        }
+      }
+    }, 100);
+  };
+
+  const handleNextQuestion = () => {
+    const availableQuestions = questions.filter((q) => !usedQuestions.includes(q.id));
+    let newQuestion;
+
+    if (availableQuestions.length === 0) {
+      setUsedQuestions([]);
+      newQuestion = questions[Math.floor(Math.random() * questions.length)];
+    } else {
+      newQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+    }
+
+    if (newQuestion) {
+      setCurrentQuestion(newQuestion.text);
+      setUsedQuestions((prev) => [...prev, newQuestion.id]);
+    }
+  };
+
+  return (
+    <main className="min-h-screen p-8 max-w-4xl mx-auto">
+      <h1 className="text-4xl font-bold mb-8 text-center">Truth Game</h1>
+
+      {/* Player Management */}
+      <div className="mb-8">
+        <div className="flex gap-2 mb-4">
+          <input
+            type="text"
+            value={newPlayerName}
+            onChange={(e) => setNewPlayerName(e.target.value)}
+            placeholder="Enter player name"
+            className="flex-1 p-2 border rounded"
+          />
+          <Button onClick={handleAddPlayer}>Add Player</Button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        <div className="text-center flex flex-col items-center mb-8">
+          <SpinningWheel
+            isSpinning={isSpinning}
+            currentPlayer={currentPlayer?.name || null}
+            currentQuestion={currentQuestion}
+            onWheelClick={() => {
+              if (!isSpinning && players.length > 0) {
+                startSpinning();
+              }
+            }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          {currentPlayer && currentQuestion ? (
+            <div className="space-y-4">
+              <div className="space-x-4">
+                <Button onClick={handleNextQuestion} variant="outline">
+                  <ArrowBigRightDash className="h-4 w-4" />
+                  Skip Question
+                  <ArrowBigRightDash className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground mt-4">Click the wheel to start the game</div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+          {players.map((player) => (
+            <div key={player.id} className="flex items-center justify-between p-2 bg-gray-100 rounded">
+              <span>{player.name}</span>
+              <Button variant="destructive" size="sm" onClick={() => handleRemovePlayer(player.id)}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
   );
 }
