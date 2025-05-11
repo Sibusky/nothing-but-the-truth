@@ -28,7 +28,7 @@ export function SpinningWheel({ isSpinning, currentPlayer, currentQuestion, onWh
   }, [isSpinning, controls]);
 
   return (
-    <div className="relative w-72 h-72 mx-auto mb-8">
+    <div className="relative w-full aspect-square max-w-[24rem] mx-auto mb-6">
       <motion.div
         className="absolute inset-0 rounded-full border-4 border-primary cursor-pointer hover:border-primary/80 transition-colors"
         animate={controls}
@@ -41,13 +41,13 @@ export function SpinningWheel({ isSpinning, currentPlayer, currentQuestion, onWh
               <motion.div
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="text-xl font-bold mb-2"
+                className="text-xl font-bold mb-2 px-2"
               >
                 {currentPlayer}
               </motion.div>
             )}
             {currentQuestion && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-sm">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-md px-2">
                 {currentQuestion}
               </motion.div>
             )}

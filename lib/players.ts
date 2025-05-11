@@ -1,6 +1,7 @@
 export interface Player {
   id: string;
   name: string;
+  active: boolean;
 }
 
 const STORAGE_KEY = "truth-game-players";
@@ -16,6 +17,7 @@ export const addPlayer = (name: string): Player[] => {
   const newPlayer: Player = {
     id: crypto.randomUUID(),
     name,
+    active: true,
   };
   const updatedPlayers = [...players, newPlayer];
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPlayers));
@@ -29,9 +31,9 @@ export const removePlayer = (id: string): Player[] => {
   return updatedPlayers;
 };
 
-export const markPlayerAsAnswered = (id: string): Player[] => {
+export const togglePlayerActive = (id: string): Player[] => {
   const players = getPlayers();
-  const updatedPlayers = players.map((player) => (player.id === id ? { ...player, hasAnswered: true } : player));
+  const updatedPlayers = players.map((player) => (player.id === id ? { ...player, active: !player.active } : player));
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPlayers));
   return updatedPlayers;
 };
