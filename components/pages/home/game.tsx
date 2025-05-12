@@ -216,7 +216,7 @@ export function Game() {
           </div>
         ) : (
           <div className="text-sm text-muted-foreground mt-4">
-            {players.length > 0 ? dictionary.game.clickToStart : dictionary.game.clickToStart}
+            {players.length > 0 ? dictionary.game.clickToStart : dictionary.game.clickToStartWithoutPlayers}
           </div>
         )}
       </div>
