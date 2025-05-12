@@ -1,0 +1,95 @@
+{
+  "home": {
+    "title": "Nothing But The Truth",
+    "description": "A fun game to get to know each other better"
+  },
+  "pages": {
+    "about": "About",
+    "home": "Home"
+  },
+  "common": {
+    "welcome": "Welcome to Nothing But The Truth",
+    "startGame": "Start Game",
+    "nextQuestion": "Next Question",
+    "previousQuestion": "Previous Question",
+    "endGame": "End Game",
+    "settings": "Settings",
+    "language": "Language"
+  },
+  "game": {
+    "playerTurn": "It's {player}'s turn",
+    "answerTruthfully": "Please answer truthfully",
+    "skipQuestion": "Skip Question",
+    "noMoreQuestions": "No more questions available",
+    "clickToStart": "Click the circle to start the game",
+    "clickToStartWithoutPlayers": "Add players and click the circle to start the game",
+    "addPlayer": "Add Player",
+    "resetProgress": "Reset Progress",
+    "resetGame": "Reset Game",
+    "removePlayer": "Remove Player"
+  },
+  "categories": {
+    "personal": "Personal",
+    "relationships": "Relationships",
+    "life": "Life",
+    "fun": "Fun",
+    "deep": "Deep Thoughts",
+    "food": "Food",
+    "travel": "Travel",
+    "animals": "Animals",
+    "world": "World",
+    "entertainment": "Entertainment",
+    "philosophy": "Philosophy",
+    "movies": "Movies"
+  },
+  "about": {
+    "title": "About the Game",
+    "backToGame": "Back to Game",
+    "howToPlay": {
+      "title": "How to Play",
+      "steps": [
+        "Add players to the game by entering their names",
+        "Click the circle to start spinning",
+        "When the circle stops, the selected player must answer the question truthfully",
+        "If a player doesn't want to answer, they can skip the question",
+        "The game continues until all players have answered questions"
+      ]
+    },
+    "rules": {
+      "title": "Rules",
+      "items": [
+        "Players must answer questions honestly",
+        "Each player can only be selected once until all players have had a turn",
+        "Questions won't repeat until all questions have been used",
+        "Players can skip questions they're uncomfortable with",
+        "There are no winners or losers - it's all about getting to know each other better!"
+      ]
+    },
+    "controls": {
+      "title": "Game Controls",
+      "resetProgress": {
+        "title": "Reset Progress",
+        "description": "Resets the current game progress while keeping all players. This will:",
+        "items": [
+          "Clear the current player and question",
+          "Reset the list of answered players",
+          "Make all questions available again"
+        ]
+      },
+      "resetGame": {
+        "title": "Reset Game",
+        "description": "Completely resets the game. This will:",
+        "items": ["Remove all players", "Clear all game progress", "Reset all questions"]
+      }
+    },
+    "tips": {
+      "title": "Tips",
+      "items": [
+        "Create a comfortable and safe environment for sharing",
+        "Respect each other's boundaries and privacy",
+        "Be supportive and non-judgmental of others' answers",
+        "Feel free to elaborate on your answers to make the game more engaging"
+      ]
+    }
+  }
+}
