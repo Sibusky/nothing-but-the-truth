@@ -25,7 +25,8 @@
     "clickToStartWithoutPlayers": "Add players and click the circle to start the game",
     "addPlayer": "Add Player",
     "resetProgress": "Reset Progress",
-    "resetGame": "Reset Game"
+    "resetGame": "Reset Game",
+    "removePlayer": "Remove Player"
   },
   "categories": {
     "personal": "Personal",

@@ -207,7 +207,7 @@ export function Game() {
         {currentPlayer && currentQuestion ? (
           <div className="space-y-4">
             <div className="space-x-4">
-              <Button onClick={handleNextQuestion} variant="outline">
+              <Button onClick={handleNextQuestion} variant="outline" aria-label={dictionary.game.skipQuestion}>
                 <ArrowBigRightDash className="h-4 w-4" />
                 {dictionary.game.skipQuestion}
                 <ArrowBigRightDash className="h-4 w-4" />
@@ -235,7 +235,7 @@ export function Game() {
               placeholder="Enter player name"
               className="flex-1 p-2 border rounded"
             />
-            <Button type="submit" className="sm:px-4">
+            <Button type="submit" className="sm:px-4" aria-label={dictionary.game.addPlayer}>
               <Plus className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">{dictionary.game.addPlayer}</span>
             </Button>
@@ -260,7 +260,12 @@ export function Game() {
                   {player.name}
                 </label>
               </div>
-              <Button variant="destructive" size="sm" onClick={() => handleRemovePlayer(player.id)}>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleRemovePlayer(player.id)}
+                aria-label={dictionary.game.removePlayer}
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -270,10 +275,15 @@ export function Game() {
 
       {players.length > 0 && (
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-          <Button variant="outline" onClick={handleResetQuestions} className="gap-2">
+          <Button
+            variant="outline"
+            onClick={handleResetQuestions}
+            className="gap-2"
+            aria-label={dictionary.game.resetProgress}
+          >
             {dictionary.game.resetProgress}
           </Button>
-          <Button variant="destructive" onClick={handleReset} className="gap-2">
+          <Button variant="destructive" onClick={handleReset} className="gap-2" aria-label={dictionary.game.resetGame}>
             {dictionary.game.resetGame}
           </Button>
         </div>

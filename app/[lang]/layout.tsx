@@ -12,36 +12,35 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   icons: {
-    icon: "/ru/favicon.ico",
     apple: "/ru/apple-touch-icon.png",
     other: [
       {
         rel: "icon",
-        url: "/ru/favicon-32x32.png",
+        url: "/favicon-32x32.png",
         sizes: "32x32",
         type: "image/png",
       },
       {
         rel: "icon",
-        url: "/ru/favicon-16x16.png",
+        url: "/favicon-16x16.png",
         sizes: "16x16",
         type: "image/png",
       },
       {
         rel: "icon",
-        url: "/ru/android-chrome-192x192.png",
+        url: "/android-chrome-192x192.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
         rel: "icon",
-        url: "/ru/android-chrome-512x512.png",
+        url: "/android-chrome-512x512.png",
         sizes: "512x512",
         type: "image/png",
       },
       {
         rel: "manifest",
-        url: "/ru/site.webmanifest",
+        url: "/site.webmanifest",
       },
     ],
   },
@@ -72,7 +71,7 @@ export default async function RootLayout({
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#4F46E5" />
-        {/* <link rel="apple-touch-icon" href="/apple-icon.png" />
+        {/* <link rel="apple-h-icon" href="/apple-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="icon" type="image/svg+xml" href="/icon.svg" /> */}

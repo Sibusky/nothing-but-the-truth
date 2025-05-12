@@ -25,7 +25,8 @@
     "clickToStartWithoutPlayers": "Добавьте игроков и нажмите на круг, чтобы начать игру",
     "addPlayer": "Добавить игрока",
     "resetProgress": "Сбросить прогресс",
-    "resetGame": "Сбросить игру"
+    "resetGame": "Сбросить игру",
+    "removePlayer": "Удалить игрока"
   },
   "categories": {
     "personal": "Личное",
