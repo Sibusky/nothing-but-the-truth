@@ -2,7 +2,8 @@ import { Game } from "@/components/pages/home/game";
 import { Locale } from "@/i18n.config";
 import { getDictionary } from "@/lib/dictionary";
 
-export default async function Home({ params: { lang } }: { params: { lang: Locale } }) {
+export default async function Home({ params }: { params: { lang: Locale } }) {
+  const { lang } = await params;
   const dictionary = await getDictionary(lang);
 
   return (
