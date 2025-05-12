@@ -2,22 +2,29 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { questions } from "@/lib/questions";
-import { Player, getPlayers, addPlayer, removePlayer, resetPlayers, togglePlayerActive } from "@/lib/players";
-import { ArrowBigRightDash, Trash2, UserPlus, RefreshCw } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowBigRightDash, Plus, X } from "lucide-react";
 import { saveGameState, loadGameState, resetGameState } from "@/lib/game-state";
 import { SpinningWheel } from "./spinning-wheel";
+import { useDictionary } from "@/app/[lang]/dictionary-provider";
+import { useParams } from "next/navigation";
+import { Player, getPlayers, addPlayer, removePlayer, resetPlayers, togglePlayerActive } from "@/lib/players";
+import { Checkbox } from "@/components/ui/checkbox";
+import { questions, Question } from "@/lib/questions";
+import { Locale } from "@/i18n.config";
 
 export function Game() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [newPlayerName, setNewPlayerName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState<string | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [isSpinning, setIsSpinning] = useState<boolean>(false);
   const [usedQuestions, setUsedQuestions] = useState<number[]>([]);
-  const [answeredPlayers, setAnsweredPlayers] = useState<string[]>([]);
+  const [answeredPlayers, setAnsweredPlayers] = useState<Set<string>>(new Set());
+
+  const dictionary = useDictionary();
+  const params = useParams();
+  const lang = params?.lang as Locale;
 
   // Load initial state
   useEffect(() => {
@@ -25,17 +32,25 @@ export function Game() {
       const savedPlayers = getPlayers();
       const savedState = loadGameState();
 
+      if (savedState.usedQuestions.length > 0) {
+        setUsedQuestions(savedState.usedQuestions);
+      }
+      if (savedState.answeredPlayers.length > 0) {
+        setAnsweredPlayers(new Set(savedState.answeredPlayers));
+      }
       setPlayers(savedPlayers);
-      setUsedQuestions(savedState.usedQuestions);
-      setAnsweredPlayers(savedState.answeredPlayers);
 
       // Only set current player and question if they exist in the saved state
-      if (savedState.currentPlayer && savedState.currentQuestion) {
-        // Find the current player in the saved players list to ensure we have the latest data
+      if (savedState.currentPlayer) {
         const currentPlayerFromList = savedPlayers.find((p) => p.id === savedState.currentPlayer?.id);
         if (currentPlayerFromList) {
           setCurrentPlayer(currentPlayerFromList);
-          setCurrentQuestion(savedState.currentQuestion);
+          if (savedState.currentQuestionId) {
+            const question = questions.find((q) => q.id === savedState.currentQuestionId);
+            if (question) {
+              setCurrentQuestion(question);
+            }
+          }
         }
       }
     };
@@ -55,12 +70,13 @@ export function Game() {
   useEffect(() => {
     const state = {
       usedQuestions,
-      answeredPlayers,
+      answeredPlayers: Array.from(answeredPlayers),
       currentPlayer,
-      currentQuestion,
+      currentQuestion: currentQuestion ? currentQuestion.translations[lang] : null,
+      currentQuestionId: currentQuestion?.id || null,
     };
     saveGameState(state);
-  }, [usedQuestions, answeredPlayers, currentPlayer, currentQuestion]);
+  }, [usedQuestions, answeredPlayers, currentPlayer, currentQuestion, lang]);
 
   const handleAddPlayer = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -98,7 +114,7 @@ export function Game() {
 
       if (randomPlayer && randomQuestion) {
         setCurrentPlayer(randomPlayer);
-        setCurrentQuestion(randomQuestion.text);
+        setCurrentQuestion(randomQuestion);
       }
 
       spinCount++;
@@ -107,12 +123,12 @@ export function Game() {
         setIsSpinning(false);
 
         // For final selection, choose only from unused options
-        const availablePlayers = players.filter((p) => p.active && !answeredPlayers.includes(p.id));
+        const availablePlayers = players.filter((p) => p.active && !answeredPlayers.has(p.id));
         const availableQuestions = questions.filter((q) => !usedQuestions.includes(q.id));
 
         // Reset if all have been used
         if (availablePlayers.length === 0) {
-          setAnsweredPlayers([]);
+          setAnsweredPlayers(new Set());
           const activePlayers = players.filter((p) => p.active);
           finalPlayerId = activePlayers[Math.floor(Math.random() * activePlayers.length)].id;
         } else {
@@ -132,8 +148,8 @@ export function Game() {
           const finalQuestion = questions.find((q) => q.id === finalQuestionId);
           if (finalPlayer && finalQuestion) {
             setCurrentPlayer(finalPlayer);
-            setCurrentQuestion(finalQuestion.text);
-            setAnsweredPlayers((prev) => [...prev, finalPlayerId!]);
+            setCurrentQuestion(finalQuestion);
+            setAnsweredPlayers(new Set([finalPlayerId!]));
             setUsedQuestions((prev) => [...prev, finalQuestionId!]);
           }
         }
@@ -153,7 +169,7 @@ export function Game() {
     }
 
     if (newQuestion) {
-      setCurrentQuestion(newQuestion.text);
+      setCurrentQuestion(newQuestion);
       setUsedQuestions((prev) => [...prev, newQuestion.id]);
     }
   };
@@ -162,13 +178,13 @@ export function Game() {
     setUsedQuestions([]);
     setCurrentQuestion(null);
     setCurrentPlayer(null);
-    setAnsweredPlayers([]);
+    setAnsweredPlayers(new Set());
   };
 
   const handleReset = () => {
     setPlayers([]);
     setUsedQuestions([]);
-    setAnsweredPlayers([]);
+    setAnsweredPlayers(new Set());
     setCurrentPlayer(null);
     setCurrentQuestion(null);
     resetPlayers();
@@ -181,7 +197,7 @@ export function Game() {
         <SpinningWheel
           isSpinning={isSpinning}
           currentPlayer={currentPlayer?.name || null}
-          currentQuestion={currentQuestion}
+          currentQuestion={currentQuestion ? currentQuestion.translations[lang] : null}
           onWheelClick={() => {
             if (!isSpinning && players.length > 0) {
               startSpinning();
@@ -193,13 +209,15 @@ export function Game() {
             <div className="space-x-4">
               <Button onClick={handleNextQuestion} variant="outline">
                 <ArrowBigRightDash className="h-4 w-4" />
-                Skip Question
+                {dictionary.game.skipQuestion}
                 <ArrowBigRightDash className="h-4 w-4" />
               </Button>
             </div>
           </div>
         ) : (
-          <div className="text-sm text-muted-foreground mt-4">Click the wheel to start the game</div>
+          <div className="text-sm text-muted-foreground mt-4">
+            {players.length > 0 ? dictionary.game.clickToStart : dictionary.game.clickToStart}
+          </div>
         )}
       </div>
 
@@ -218,8 +236,8 @@ export function Game() {
               className="flex-1 p-2 border rounded"
             />
             <Button type="submit" className="sm:px-4">
-              <UserPlus className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Add Player</span>
+              <Plus className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">{dictionary.game.addPlayer}</span>
             </Button>
           </div>
           {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
@@ -243,7 +261,7 @@ export function Game() {
                 </label>
               </div>
               <Button variant="destructive" size="sm" onClick={() => handleRemovePlayer(player.id)}>
-                <Trash2 className="h-4 w-4" />
+                <X className="h-4 w-4" />
               </Button>
             </div>
           ))}
@@ -253,12 +271,10 @@ export function Game() {
       {players.length > 0 && (
         <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
           <Button variant="outline" onClick={handleResetQuestions} className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Reset Progress
+            {dictionary.game.resetProgress}
           </Button>
           <Button variant="destructive" onClick={handleReset} className="gap-2">
-            <Trash2 className="h-4 w-4" />
-            Reset Game
+            {dictionary.game.resetGame}
           </Button>
         </div>
       )}

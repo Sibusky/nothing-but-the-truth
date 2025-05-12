@@ -7,6 +7,7 @@ interface GameState {
   answeredPlayers: string[];
   currentPlayer: Player | null;
   currentQuestion: string | null;
+  currentQuestionId: number | null;
 }
 
 export const saveGameState = (state: GameState): void => {
@@ -21,6 +22,7 @@ export const loadGameState = (): GameState => {
       answeredPlayers: [],
       currentPlayer: null,
       currentQuestion: null,
+      currentQuestionId: null,
     };
   const stored = localStorage.getItem(STORAGE_KEY);
   return stored
@@ -30,6 +32,7 @@ export const loadGameState = (): GameState => {
         answeredPlayers: [],
         currentPlayer: null,
         currentQuestion: null,
+        currentQuestionId: null,
       };
 };
 
