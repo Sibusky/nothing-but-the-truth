@@ -4,8 +4,9 @@ import { ArrowLeft } from "lucide-react";
 import { getDictionary } from "@/lib/dictionary";
 import { Locale } from "@/i18n.config";
 
-export default async function About({ params: { lang } }: { params: { lang: string } }) {
-  const dictionary = await getDictionary(lang as Locale);
+export default async function About({ params }: { params: Promise<{ lang: Locale }> }) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang);
 
   return (
     <main className="min-h-screen p-4 sm:p-6 md:p-8 max-w-4xl mx-auto">

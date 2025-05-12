@@ -4,9 +4,9 @@ import { getDictionary } from "@/lib/dictionary";
 import { Locale } from "@/i18n.config";
 import { LanguageSwitcher } from "./language-switcher";
 
-export default async function Footer({ params }: { params: { lang: string } }) {
+export default async function Footer({ params }: { params: Promise<{ lang: Locale }> }) {
   const { lang } = await params;
-  const dictionary = await getDictionary(lang as Locale);
+  const dictionary = await getDictionary(lang);
 
   return (
     <footer className="border-t bg-background">
