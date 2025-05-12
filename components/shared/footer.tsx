@@ -4,7 +4,8 @@ import { getDictionary } from "@/lib/dictionary";
 import { Locale } from "@/i18n.config";
 import { LanguageSwitcher } from "./language-switcher";
 
-export default async function Footer({ params: { lang } }: { params: { lang: string } }) {
+export default async function Footer({ params }: { params: { lang: string } }) {
+  const { lang } = await params;
   const dictionary = await getDictionary(lang as Locale);
 
   return (
